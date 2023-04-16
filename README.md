@@ -20,6 +20,10 @@ Below describe physical attacks. These are the "tape on a stop sign" papers.
 
 [2018 "Robust Physical-World Attacks on Deep Learning Visual Classification" - Eykholt](https://arxiv.org/pdf/1707.08945.pdf)
 
+Below describes a defense that is effective against earlier attacks (Goodfellow's FGSM and Szegedy’s L-BFGS).
+
+[2016 "Distillation as a Defense to Adversarial Perturbations against Deep Neural Networks" - Papernot](https://arxiv.org/pdf/1511.04508.pdf)
+
 Earlier works propose that existence of adversial examples in neural networks arise since the models do not generalize well, which may be due to their high complexity. However, the following work shows that even linear models are vulnerable. The authors describe a simple method (a.k.a. Fast Gradient Sign Method FGSM) to generate adversial examples, and uses adversial training to reduce error on MNIST classification.
 
 [2015 "Explaining and Harnessing Adversial Examples" - Goodfellow](https://arxiv.org/pdf/1412.6572.pdf)
