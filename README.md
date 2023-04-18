@@ -1,5 +1,12 @@
 # chadversaries
 
+## TODO
+- Figure out how to preprocess MNIST
+- Generate adversarial examples on MNIST
+- Implement CNNs
+- Link devpost to README
+- Include or link outline in README
+
 ## References
 
 Below is an algorithm that generates adversial examples. It is one of the recent powerful ones that is used as a benchmark to test a model's robustness.
