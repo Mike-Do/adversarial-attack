@@ -15,9 +15,8 @@ def main(input_filepath="../data/dataset.pk", output_filepath="../data/result.pk
         dataset = pk.load(fd)  # TODO we can also load MNIST data from sklearn.datasets.load_digits
 
     # TODO preprocess data, train CNN, and store data in a pickle file
-    # TODO figure out what we want to store. Accuracy? Examples? Loss?
 
-    to_store = None  # data to store goes here
+    to_store = None  # store image and its corresponding classification - e.g. list of tuples (image, classification)
     with open(output_filepath, "rb") as fd:
         pk.dump(to_store, fd)
 
