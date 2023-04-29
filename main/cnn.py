@@ -52,6 +52,51 @@ class CNN(tf.keras.Model):
         # Softmax10
         self.softmax = tf.keras.layers.Dense(units=10, activation='softmax')
 
+    def call(self, inputs, is_testing=False):
+        """
+        Runs a forward pass on the network
+
+        :param inputs: input images
+        :param is_testing: if True, we do not apply dropout
+        :return: output of the network
+        """
+
+        # Convolution+ReLU3×3×32
+        x = self.conv1(inputs)
+        # Convolution+ReLU3×3×32
+        x = self.conv2(x)
+        # MaxPooling2×2
+        x = self.maxpool1(x)
+        # Convolution+ReLU3×3×64
+        x = self.conv3(x)
+        # Convolution+ReLU3×3×64
+        x = self.conv4(x)
+        # MaxPooling2×2
+        x = self.maxpool2(x)
+        # FullyConnected+ReLU200
+        x = self.fc1(x)
+        # FullyConnected+ReLU200
+        x = self.fc2(x)
+        # Softmax10
+        x = self.softmax(x)
+
+        return x
+    
+    def loss(self, logits, labels):
+        """
+        Computes the loss of the network for L2 attack
+        The loss is the cross entropy loss of the network
+        Loss for L2 attack: f(x)= max(max{Z(x)i:i=t} - Z(x)t,−κ)
+
+
+        :param logits: output of the network
+        :param labels: true labels
+        :return: loss
+        """
+
+        #! double check this
+        return tf.keras.losses.categorical_crossentropy(y_true=labels, y_pred=logits)
+
 
 
 def main(input_filepath="../data/dataset.pk", output_filepath="../data/result.pk"):
