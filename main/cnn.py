@@ -99,7 +99,6 @@ class CNN(tf.keras.Model):
         :return: loss
         """
 
-        #! double check this
         cce = tf.nn.softmax_cross_entropy_with_logits(labels, logits)
         return tf.reduce_mean(cce)
 
