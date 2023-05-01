@@ -14,6 +14,7 @@ class CNN(tf.keras.Model):
         """
 
         """Hyperparameters"""
+        super().__init__()
         # LearningRate0.1
         self.learning_rate = 0.1
         # Momentum0.9
@@ -29,7 +30,7 @@ class CNN(tf.keras.Model):
         # visualize loss over time
         self.loss_list = []
         # momentum-based SGD optimizer
-        self.optimizer = tf.keras.optimizers.SGD(learning_rate=self.learning_rate, momentum=self.momentum)
+        self.optimizer = tf.keras.optimizers.legacy.SGD(learning_rate=self.learning_rate, momentum=self.momentum)
 
 
         """Architecture"""
@@ -49,6 +50,8 @@ class CNN(tf.keras.Model):
         self.fc1 = tf.keras.layers.Dense(units=200, activation='relu')
         # FullyConnected+ReLU200
         self.fc2 = tf.keras.layers.Dense(units=200, activation='relu')
+        # Dense(10)
+        self.fc3 = tf.keras.layers.Dense(10)
         # Softmax10
         self.softmax = tf.keras.layers.Dense(units=10, activation='softmax')
 
@@ -73,16 +76,18 @@ class CNN(tf.keras.Model):
         x = self.conv4(x)
         # MaxPooling2×2
         x = self.maxpool2(x)
+        # Flatten
+        x = tf.keras.layers.Flatten()(x)
         # FullyConnected+ReLU200
         x = self.fc1(x)
         # FullyConnected+ReLU200
         x = self.fc2(x)
-        # Softmax10
-        x = self.softmax(x)
+        # Dense 10
+        x = self.fc3(x)
 
         return x
     
-    def loss(self, logits, labels):
+    def loss(self, labels, logits):
         """
         Computes the loss of the network for L2 attack
         The loss is the cross entropy loss of the network
@@ -95,22 +100,37 @@ class CNN(tf.keras.Model):
         """
 
         #! double check this
-        return tf.keras.losses.categorical_crossentropy(y_true=labels, y_pred=logits)
+        cce = tf.nn.softmax_cross_entropy_with_logits(labels, logits)
+        return tf.reduce_mean(cce)
 
 
 
 def main(input_filepath="../data/dataset.pk", output_filepath="../data/result.pk"):
 
-    with open(input_filepath, "wb") as fd:
-        dataset = pk.load(fd)  # TODO we can also load MNIST data from sklearn.datasets.load_digits
+    # with open(input_filepath, "wb") as fd:
+    #     dataset = pk.load(fd)  # TODO we can also load MNIST data from sklearn.datasets.load_digits
 
     # TODO preprocess data, train CNN, and store data in a pickle file
+    (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
+    x_train = (x_train / 255) - 0.5
+    x_train = np.reshape(x_train, (-1, 28, 28, 1))
+    x_test = (x_test / 255) - 0.5
+    x_test = np.reshape(x_test, (-1, 28, 28, 1))
+    y_train = tf.one_hot(y_train, 10)
+    y_test = tf.one_hot(y_test, 10)
+
+    model = CNN()
+    model.compile(loss=model.loss, optimizer=model.optimizer, metrics=[tf.keras.metrics.CategoricalAccuracy()])
+    model.fit(x_train, y_train, batch_size=model.batch_size, epochs=model.epochs, shuffle = True)
+    model.save("trained_model")
+    model.evaluate(x_test, y_test, batch_size=model.batch_size)
 
     to_store = None  # store image and its corresponding classification - e.g. list of tuples (image, classification)
-    with open(output_filepath, "rb") as fd:
-        pk.dump(to_store, fd)
+    # with open(output_filepath, "rb") as fd:
+    #     pk.dump(to_store, fd)
 
 
 if __name__ == "__main__":
-    input_filepath, output_filepath = sys.argv[1:3]
-    main(input_filepath, output_filepath)
+    # input_filepath, output_filepath = sys.argv[1:3]
+    # main(input_filepath, output_filepath)
+    main()
