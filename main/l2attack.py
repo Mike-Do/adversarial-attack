@@ -33,7 +33,9 @@ class L2Attack:
         This is the function f that is minimized to ensure that the perturbed image
         attacks the model successfully
         """
+        xp = tf.reshape(xp, [1, 28, 28, 1])
         Z = self.model(xp)
+        Z = tf.reshape(Z, [10])
         ret = tf.reduce_max(Z) - Z[target]
         return tf.maximum(0.0, ret)
     
