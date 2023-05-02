@@ -103,7 +103,7 @@ class CNN(tf.keras.Model):
         return tf.reduce_mean(cce)
 
 
-def main(model_filepath="trained_model", input_filepath="../data/dataset.pk", output_filepath="../data/result.pk"):
+def main(model_filepath="../models/vanilla", input_filepath="../data/dataset.pk", output_filepath="../data/result.pk"):
 
     # with open(input_filepath, "wb") as fd:
     #     dataset = pk.load(fd)  # TODO we can also load MNIST data from sklearn.datasets.load_digits

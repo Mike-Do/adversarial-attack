@@ -51,7 +51,7 @@ class L2Attack:
         return dist_loss, model_loss, total_loss
 
 
-def main(model_filepath="trained_model", input_filepath="../data/dataset.pk", output_filepath="../data/l2attack.pk"):
+def main(model_filepath="../models/vanilla", input_filepath="../data/dataset.pk", output_filepath="../data/l2attack.pk"):
 
     (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
     x, y = x_test[0], y_test[0]
