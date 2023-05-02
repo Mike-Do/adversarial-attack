@@ -89,9 +89,8 @@ class CNN(tf.keras.Model):
     
     def loss(self, labels, logits):
         """
-        Computes the loss of the network for L2 attack
+        Computes the loss of the network
         The loss is the cross entropy loss of the network
-        Loss for L2 attack: f(x)= max(max{Z(x)i:i=t} - Z(x)t,−κ)
 
 
         :param logits: output of the network
@@ -119,16 +118,14 @@ def main(model_filepath="../models/vanilla", input_filepath="../data/dataset.pk"
 
     model = CNN()
     model.compile(loss=model.loss, optimizer=model.optimizer, metrics=[tf.keras.metrics.CategoricalAccuracy()])
-    model.fit(x_train, y_train, batch_size=model.batch_size, epochs=model.epochs, shuffle = True)
+    model.fit(x_train, y_train, batch_size=model.batch_size, epochs=model.epochs, shuffle=True)
     model.save(model_filepath)
     model.evaluate(x_test, y_test, batch_size=model.batch_size)
 
-    to_store = None  # store image and its corresponding classification - e.g. list of tuples (image, classification)
+    # to_store = None  # store image and its corresponding classification - e.g. list of tuples (image, classification)
     # with open(output_filepath, "rb") as fd:
     #     pk.dump(to_store, fd)
 
 
 if __name__ == "__main__":
-    # input_filepath, output_filepath = sys.argv[1:3]
-    # main(input_filepath, output_filepath)
     main()
