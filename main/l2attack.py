@@ -1,10 +1,10 @@
 """
-Generating adversarial examples using the l2 attack as in Carlini and Walker 2016
+Generating adversarial examples using the l2 attack as in Carlini and Wagner 2016
 """
 
 import pickle as pk
 import tensorflow as tf
-from tqdm import tqdm
+from tqdm import tqdm # shows progress bar during training
 from cnn import CNN
 
 
@@ -24,20 +24,26 @@ class L2Attack:
         :param target: integer corresponding to label target classification
         :return xp: perturbed image that makes the model classify it as the target classification
         """
+        # initialize w to be a random image
         x = tf.cast(x, dtype=tf.float32)
         w = tf.Variable(tf.random.normal(tf.shape(x)), dtype=tf.float32)
 
+        # if num_epochs is None, run until the thresholds are reached
         if self.num_epochs is None:
+            # run one iteration to get initial values
             dist_loss, f_loss, _ = self.train(x, target, w)
             epoch = 0
+            # run until thresholds are reached
             while (dist_loss > self.threshold_dist) or (f_loss > self.threshold_f):
                 dist_loss, f_loss, _ = self.train(x, target, w)
                 pred = self.model_prediction(w)[0]
                 print(f"Epoch {epoch} | dist loss {dist_loss:.3f} | f loss {f_loss:.3f} | model pred {pred}")
                 epoch += 1
+            # the perturbed image is modified by the tanh function
             xp = 0.5 * (tf.tanh(w) + 1)
             return xp
         else:
+            # otherwise, run for num_epochs iterations
             for _ in tqdm(range(self.num_epochs)):
                 dist_loss, f_loss, _ = self.train(x, target, w)
                 pred = self.model_prediction(w)
@@ -51,8 +57,11 @@ class L2Attack:
         This is the function f that is minimized to ensure that the perturbed image
         attacks the model successfully
 
-        f(x)= max(max{Z(x)i:i!=t} - Z(x)t,−κ)
-
+        f(x)= max(max{Z(x)i: i!=t} - Z(x)t, −κ)
+        
+        Z is the output of the model, Z(x)i is the ith element of Z(x), and t is the target class.
+        κ is a constant that controls the confidence of the attack; we set κ = 0 in all experiments.
+        
         :param xp: perturbed image of size [BATCH_SIZE, WIDTH, HEIGHT, NUM_CHANNELS]
         :param target: integer corresponding to label of target classification
         """
@@ -89,12 +98,13 @@ class L2Attack:
 
 
 def main(**kwargs):
-
+    # grab parameters from kwargs
     index = kwargs["index"]
     target = kwargs["target"]
     model_filepath = kwargs["model_filepath"]
     output_filepath = kwargs["output_filepath"]
 
+    # load model and data, and normalize data
     model = tf.keras.models.load_model(model_filepath, custom_objects={"loss": CNN.loss})
 
     (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
@@ -105,8 +115,10 @@ def main(**kwargs):
 
     x = x_test[index]
 
+    # ensure that the model classifies x as the target
     assert y_test[index] != target
 
+    # run attack
     attack = L2Attack(model, **kwargs)
     xp = attack(x, target)
 
@@ -115,11 +127,12 @@ def main(**kwargs):
 
 
 if __name__ == "__main__":
+    # hyperparameters passed as kwargs
     kwargs = {
         "index": 21,
         "target": 3,
         "c": 100,
-        "num_epochs": 2500,  # If None, run until it reaches the thresholds
+        "num_epochs": 2500,  # If None, attack runs until it reaches the thresholds
         "threshold_dist": 200.0,
         "threshold_f": 0.01,
         "model_filepath": "../models/vanilla",

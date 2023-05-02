@@ -1,5 +1,5 @@
 """
-CNN defined by Carlini and Walker 2016
+CNN defined by Carlini and Wagner 2016
 """
 import sys
 import pickle as pk
@@ -104,10 +104,11 @@ class CNN(tf.keras.Model):
 
 def main(model_filepath="../models/vanilla", input_filepath="../data/dataset.pk", output_filepath="../data/result.pk"):
 
+    # OPTIONAL: load dataset into a pickle file
     # with open(input_filepath, "wb") as fd:
     #     dataset = pk.load(fd)  # TODO we can also load MNIST data from sklearn.datasets.load_digits
 
-    # TODO preprocess data, train CNN, and store data in a pickle file
+    # load MNIST data and normalize
     (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
     x_train = (x_train / 255) - 0.5
     x_train = np.reshape(x_train, (-1, 28, 28, 1))
@@ -116,12 +117,14 @@ def main(model_filepath="../models/vanilla", input_filepath="../data/dataset.pk"
     y_train = tf.one_hot(y_train, 10)
     y_test = tf.one_hot(y_test, 10)
 
+    # train and evaluate model on original MNIST data
     model = CNN()
     model.compile(loss=model.loss, optimizer=model.optimizer, metrics=[tf.keras.metrics.CategoricalAccuracy()])
     model.fit(x_train, y_train, batch_size=model.batch_size, epochs=model.epochs, shuffle=True)
     model.save(model_filepath)
     model.evaluate(x_test, y_test, batch_size=model.batch_size)
 
+    # OPTIONAL: store results in a pickle file
     # to_store = None  # store image and its corresponding classification - e.g. list of tuples (image, classification)
     # with open(output_filepath, "rb") as fd:
     #     pk.dump(to_store, fd)
