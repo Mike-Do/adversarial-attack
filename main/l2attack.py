@@ -19,7 +19,7 @@ class L2Attack:
     def __call__(self, x, target):
         """
         :param x: input image
-        :param target: label corresponding to target classification
+        :param target: integer corresponding to label target classification
         :return xp: perturbed image that makes the model classify it as the target classification
         """
         w = tf.Variable(tf.random.normal(tf.shape(x)))
@@ -32,6 +32,8 @@ class L2Attack:
         """
         This is the function f that is minimized to ensure that the perturbed image
         attacks the model successfully
+        :param xp: perturbed image of size [BATCH_SIZE, WIDTH, HEIGHT, NUM_CHANNELS]
+        :param target: integer corresponding to label of target classification
         """
         xp = tf.reshape(xp, [1, 28, 28, 1])
         Z = self.model(xp)
