@@ -103,8 +103,7 @@ class CNN(tf.keras.Model):
         return tf.reduce_mean(cce)
 
 
-
-def main(input_filepath="../data/dataset.pk", output_filepath="../data/result.pk"):
+def main(model_filepath="trained_model", input_filepath="../data/dataset.pk", output_filepath="../data/result.pk"):
 
     # with open(input_filepath, "wb") as fd:
     #     dataset = pk.load(fd)  # TODO we can also load MNIST data from sklearn.datasets.load_digits
@@ -121,7 +120,7 @@ def main(input_filepath="../data/dataset.pk", output_filepath="../data/result.pk
     model = CNN()
     model.compile(loss=model.loss, optimizer=model.optimizer, metrics=[tf.keras.metrics.CategoricalAccuracy()])
     model.fit(x_train, y_train, batch_size=model.batch_size, epochs=model.epochs, shuffle = True)
-    model.save("trained_model")
+    model.save(model_filepath)
     model.evaluate(x_test, y_test, batch_size=model.batch_size)
 
     to_store = None  # store image and its corresponding classification - e.g. list of tuples (image, classification)
