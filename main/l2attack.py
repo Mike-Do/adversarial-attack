@@ -4,7 +4,7 @@ Generating adversarial examples using the l2 attack as in Carlini and Wagner 201
 
 import pickle as pk
 import tensorflow as tf
-from tqdm import tqdm # shows progress bar during training
+from tqdm import tqdm  # shows progress bar during training
 from cnn import CNN
 
 
@@ -115,7 +115,7 @@ def main(**kwargs):
 
     x = x_test[index]
 
-    # ensure that the model classifies x as the target
+    # ensure that the target is different from ground truth
     assert y_test[index] != target
 
     # run attack
