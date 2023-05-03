@@ -125,7 +125,6 @@ def main(**kwargs):
     with open(output_filepath, "wb") as fd:
         pk.dump(xp, fd)
 
-
 if __name__ == "__main__":
     # hyperparameters passed as kwargs
     kwargs = {
