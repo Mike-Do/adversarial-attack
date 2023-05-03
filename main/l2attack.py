@@ -12,7 +12,7 @@ class L2Attack:
 
     def __init__(self, model, **kwargs):
         self.model = model  # NOTE the model must return logits
-        self.optimizer = tf.keras.optimizers.Adam()
+        self.optimizer = tf.keras.optimizers.Adam(learning_rate=kwargs["learning_rate"])
         self.c = kwargs["c"]
         self.num_epochs = kwargs["num_epochs"]
         self.threshold_dist = kwargs["threshold_dist"]
@@ -129,9 +129,10 @@ def main(**kwargs):
 if __name__ == "__main__":
     # hyperparameters passed as kwargs
     kwargs = {
-        "index": 21,
-        "target": 3,
-        "c": 100,
+        "index": 0,
+        "target": 5,
+        "c": 1,
+        "learning_rate": 1e-2,
         "num_epochs": 2500,  # If None, attack runs until it reaches the thresholds
         "threshold_dist": 200.0,
         "threshold_f": 0.01,
