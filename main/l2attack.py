@@ -27,7 +27,7 @@ class L2Attack:
         """
         # initialize w to be a random image
         x = tf.cast(x, dtype=tf.float32)
-        w = tf.Variable(tf.random.normal((tf.shape(x)), dtype=tf.float32,mean=0, stddev=0.5))
+        w = tf.Variable(tf.random.normal(tf.shape(x)), dtype=tf.float32)
 
         # if num_epochs is None, run until the thresholds are reached
         if self.num_epochs is None:
@@ -67,26 +67,22 @@ class L2Attack:
         :param target: integer corresponding to label of target classification
         """
         xp = tf.expand_dims(xp, axis=0)
-        # print(xp[0][0])
-        Z = self.model(xp, training=False)[0]
-        # print(Z)
-        # Z = tf.reshape(Z, [10])
+        Z = self.model(xp)
+        Z = tf.reshape(Z, [10])
         Zt = Z[target]
-        max_z = tf.reduce_max(Z)
-        # Z = tf.concat([Z[:target], Z[target+1:]], axis=0)  # i != t
+        Z = tf.concat([Z[:target], Z[target+1:]], axis=0)  # i != t
         ret = tf.reduce_max(Z) - Zt
-        return tf.maximum(0.0, max_z - Zt)
+        return tf.maximum(0.0, ret)
 
     def train(self, x, target, w):
         """
         Performs one iteration of optimizing the objective function
         """
         with tf.GradientTape() as tape:
-            tape.watch(w)
             delta = 0.5 * (tf.tanh(w) + 1) - x
             dist_loss = tf.square(tf.norm(delta, ord="euclidean"))
             f_loss = self.f(delta + x, target)
-            total_loss = dist_loss + self.c * tf.dtypes.cast(f_loss, tf.dtypes.float32)
+            total_loss = dist_loss + self.c * f_loss
         gradients = tape.gradient(total_loss, w)
         self.optimizer.apply_gradients(zip([gradients], [w]))
         return dist_loss, f_loss, total_loss
@@ -145,7 +141,7 @@ if __name__ == "__main__":
         "target": target,
         "c": 10,
         "learning_rate": 1e-2,
-        "num_epochs": 2500,  # If None, attack runs until it reaches the thresholds
+        "num_epochs": None,  # If None, attack runs until it reaches the thresholds
         "threshold_dist": 170.0,
         "threshold_f": 0.01,
         "model_filepath": "../models/vanilla",
