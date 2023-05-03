@@ -2,6 +2,7 @@
 Generating adversarial examples using the l2 attack as in Carlini and Wagner 2016
 """
 
+import sys
 import pickle as pk
 import tensorflow as tf
 from tqdm import tqdm  # shows progress bar during training
@@ -58,10 +59,10 @@ class L2Attack:
         attacks the model successfully
 
         f(x)= max(max{Z(x)i: i!=t} - Z(x)t, −κ)
-        
+
         Z is the output of the model, Z(x)i is the ith element of Z(x), and t is the target class.
         κ is a constant that controls the confidence of the attack; we set κ = 0 in all experiments.
-        
+
         :param xp: perturbed image of size [BATCH_SIZE, WIDTH, HEIGHT, NUM_CHANNELS]
         :param target: integer corresponding to label of target classification
         """
@@ -99,7 +100,7 @@ class L2Attack:
 
 def main(**kwargs):
     # grab parameters from kwargs
-    index = kwargs["index"]
+    source = kwargs["source"]
     target = kwargs["target"]
     model_filepath = kwargs["model_filepath"]
     output_filepath = kwargs["output_filepath"]
@@ -113,6 +114,8 @@ def main(**kwargs):
     x_test = (x_test / 255) - 0.5
     x_test = tf.reshape(x_test, (-1, 28, 28, 1))
 
+    # find image that matches source
+    index = tf.where(y_test == source)[0][0]
     x = x_test[index]
 
     # ensure that the target is different from ground truth
@@ -122,21 +125,27 @@ def main(**kwargs):
     attack = L2Attack(model, **kwargs)
     xp = attack(x, target)
 
+    print(f"Index: {index}")
     with open(output_filepath, "wb") as fd:
         pk.dump(xp, fd)
 
 
 if __name__ == "__main__":
+    # source and target passed in from terminal
+    if len(sys.argv) != 3:
+        raise Exception("Missing arguments. Expected `python l2attack.py <source> <target>`.")
+    source = int(sys.argv[1])
+    target = int(sys.argv[2])
     # hyperparameters passed as kwargs
     kwargs = {
-        "index": 0,
-        "target": 5,
+        "source": source,
+        "target": target,
         "c": 1,
         "learning_rate": 1e-2,
         "num_epochs": 2500,  # If None, attack runs until it reaches the thresholds
         "threshold_dist": 200.0,
         "threshold_f": 0.01,
         "model_filepath": "../models/vanilla",
-        "output_filepath": "../data/l2attack.pk"
+        "output_filepath": f"../data/{source}p{target}.pk"
     }
     main(**kwargs)
