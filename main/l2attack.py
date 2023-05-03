@@ -141,7 +141,7 @@ if __name__ == "__main__":
         "target": target,
         "c": 10,
         "learning_rate": 1e-2,
-        "num_epochs": None,  # If None, attack runs until it reaches the thresholds
+        "num_epochs": 2500,  # If None, attack runs until it reaches the thresholds
         "threshold_dist": 170.0,
         "threshold_f": 0.01,
         "model_filepath": "../models/vanilla",

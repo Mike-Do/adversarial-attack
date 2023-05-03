@@ -6,69 +6,56 @@ import pickle as pk
 import pickle as pk
 import matplotlib.pyplot as plt
 import tensorflow as tf
-from cnn import CNN
 import numpy as np
-from l2attack import main as l2attack_main
-
-# def main(input_filepath="../data/l2attack.pk", output_filepath="../fig/l2attack.png"):
-
-#     with open(input_filepath, "rb") as fd:
-#         results = pk.load(fd)
 
 def original_vs_adversarial():
-    # write a function that plots the original image and the adversarial image side by side
+    """
+    Function that plots the original image and the adversarial image in a 10x10 grid
+    for each row, the original image is the same, but the adversarial image varies based on the column digit
 
-    # global plot for the entire script, 10 rows, 2 columns
-    fig, ax = plt.subplots(10, 2, figsize=(10, 20))
+    All data is stored as a pk file in ../data where the format is ApB.pk, where A is the source digit and B is the target digit
+    """
 
+    # global plot for the entire script, 10 rows, 10 columns with spaces in between and each row and column is enumerated 0-9
+    fig, ax = plt.subplots(10, 10, figsize=(10, 10))
+    fig.suptitle("Target Classification (L2)", fontsize=16, fontweight="bold")
+    fig.supylabel("Source Classification", fontsize=16, fontweight="bold")
+
+    # give each row a title
     for i in range(10):
-        kwargs = {
-            "index": i,
-            # same misclassified label of l+1(mod10)
-            "target": (i + 1) % 10,
-            "c": 1,
-            "learning_rate": 1e-2,
-            "num_epochs": 2500,  # If None, attack runs until it reaches the thresholds
-            "threshold_dist": 200.0,
-            "threshold_f": 0.01,
-            "model_filepath": "../models/vanilla",
-            "output_filepath": "../data/l2attack.pk"
-        }
-        l2attack_main(**kwargs)
+        ax[i, 0].set_ylabel(f"{i}", fontsize=16)
 
-        # load original image
-        (x_train, y_train), (x_test, y_test) = tf.keras.datasets.mnist.load_data()
-        x_train = (x_train / 255) - 0.5
-        x_train = np.reshape(x_train, (-1, 28, 28, 1))
-        x_test = (x_test / 255) - 0.5
-        x_test = np.reshape(x_test, (-1, 28, 28, 1))
-        original = x_test[i]
+    # give each column a title
+    for i in range(10):
+        ax[0, i].set_title(f"{i}", fontsize=16)
 
-        # load adversarial image
-        with open("../data/l2attack.pk", "rb") as fd:
-            adversarial = pk.load(fd)
-        adversarial = tf.reshape(adversarial, [1, 28, 28, 1])
+    # reduce spacing between subplots
+    fig.tight_layout()
 
-        # plot original image
-        ax = fig.add_subplot(10, 2, 2 * i + 1)
-        ax.imshow(original, cmap='gray')
-        ax.set_title(f"Original Image: {y_test[i]}")
+    # loop through each row and column and plot the image by pulling the data from the pk file and placing it in the correct row and column
+    for source in range(10):
+        for target in range(10):
+            input_filepath=f"../data/{source}p{target}.pk"
+            #  if the input_filepath does not exist, then skip
 
-        # plot adversarial image
-        ax = fig.add_subplot(10, 2, 2 * i + 2)
-        ax.imshow(original, cmap='gray')
-        ax.set_title(f"Original Image: {y_test[i]}")
-
-        # plot adversarial image
-        ax = fig.add_subplot(10, 2, 2 * i + 2)
-        ax.imshow(adversarial[0], cmap='gray')
-        ax.set_title(f"Adversarial Image: {(y_test[i] + 1) % 10}")
+            with open(input_filepath, "rb") as fd:
+                xp = pk.load(fd)
+          
+            xp = tf.reshape(xp, [1, 28, 28, 1])
+            ax[source, target].imshow(xp[0], cmap='gray')
+            # preserve the label on the y-axis
+            if target == 0:
+                # keep the label on the y-axis
+                ax[source, target].set_ylabel(f"{source}", fontsize=16)
+                # remove all other axis elements
+                ax[source, target].set_xticks([])
+                ax[source, target].set_yticks([])
+            else:
+                ax[source, target].axis("off")
 
     plt.tight_layout()
     plt.savefig("../fig/l2attack.png")
     plt.show()
 
-
 if __name__ == "__main__":
-    # main()
     original_vs_adversarial()
