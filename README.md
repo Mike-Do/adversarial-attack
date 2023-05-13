@@ -1,4 +1,16 @@
-# chadversaries
+<p align="center">
+  <img src="poster.jpg" />
+</p>
+
+# Adversarial Attack for Image Classification
+
+> **Click the emoji for the Final Writeup: [😈](https://docs.google.com/document/d/1-UhVqLILaGdkI_JJMvDRpJlAbZ-h5loT4zcXz222Jj8/edit?usp=sharing)**
+
+Neural networks are vulnerable to adversarial attacks. Attackers can intentionally design inputs to cause the model to make mistakes. In our work, we attack convolutional neural networks (CNN) used to classify images in the MNIST dataset.
+
+Many adversarial attacks exist (Biggio, Szegedy’s L-BFGS, Goodfellow’s FGSM), and are able to generate adversarial examples quickly. However, the defense strategy (distilled defense) proposed by (Papernot et al. 2016) was shown to be successful against these attacks. An attack proposed by Carlini and Wagner counterattacks this distilled defense strategy.
+
+In our work, we implement Carlini and Wagner’s attack on a CNN used to classify digits from the MNIST dataset. The Carlini Wagner attack is a state-of-the-art attack in the field of adversarial machine learning, and has been frequently used to benchmark the robustness of machine learning models.
 
 ## References
 
