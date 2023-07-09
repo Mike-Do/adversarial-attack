@@ -4,7 +4,7 @@
 
 # Adversarial Attack for Image Classification
 
-> **Click the emoji for the Final Writeup: [😈](https://docs.google.com/document/d/1-UhVqLILaGdkI_JJMvDRpJlAbZ-h5loT4zcXz222Jj8/edit?usp=sharing)**
+> **Click the emoji for Writeup: [😈](https://docs.google.com/document/d/1ozJ5GnrTGslRPNR5j9txo4anwz9y_g3Mq_1u2AyG8mM/edit?usp=sharing)**
 
 Neural networks are vulnerable to adversarial attacks. Attackers can intentionally design inputs to cause the model to make mistakes. In our work, we attack convolutional neural networks (CNN) used to classify images in the MNIST dataset.
 
